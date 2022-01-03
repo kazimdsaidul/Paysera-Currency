@@ -1,5 +1,7 @@
 package com.saidul.paysera.di
 
+import com.localebro.okhttpprofiler.OkHttpProfilerInterceptor
+import com.saidul.paysera.BuildConfig
 import com.saidul.paysera.data.remote.ApiService
 import dagger.Module
 import dagger.Provides
@@ -26,11 +28,19 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun providesOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient =
-        OkHttpClient
+    fun providesOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+
+        val build = OkHttpClient
             .Builder()
             .addInterceptor(httpLoggingInterceptor)
-            .build()
+
+        if (BuildConfig.DEBUG) {
+            build.addInterceptor(OkHttpProfilerInterceptor())
+        }
+
+        return build.build();
+    }
+
 
     @Singleton
     @Provides
@@ -44,7 +54,4 @@ object ApiModule {
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
 
-//    @Singleton
-//    @Provides
-//    fun providesRepository(apiService: ApiService) = Repository(apiService)
 }

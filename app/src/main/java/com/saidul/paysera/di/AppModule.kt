@@ -3,6 +3,7 @@ package com.saidul.paysera.di
 import android.app.Application
 import androidx.room.Room
 import com.saidul.paysera.data.data_source.NoteDatabase
+import com.saidul.paysera.data.remote.ApiService
 import com.saidul.paysera.data.repository.CurrencyRepositoryImpl
 import com.saidul.paysera.domain.repository.CurrencyRepository
 import dagger.Module
@@ -27,18 +28,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNoteRepository(db: NoteDatabase): CurrencyRepository {
-        return CurrencyRepositoryImpl(db.noteDao)
+    fun provideNoteRepository(db: NoteDatabase, apiService: ApiService): CurrencyRepository {
+        return CurrencyRepositoryImpl(db.noteDao, apiService)
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideNoteUseCases(repository: NoteRepository): NoteUseCases {
-//        return NoteUseCases(
-//            getNotes = GetNotes(repository),
-//            deleteNote = DeleteNote(repository),
-//            addNote = AddNote(repository),
-//            getNote = GetNote(repository)
-//        )
-//    }
 }
