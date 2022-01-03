@@ -124,32 +124,38 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
             override fun afterTextChanged(s: Editable) {
-                if (!s.equals("")) {
+                if (!s.equals("") && s.isNotEmpty()) {
                     myViewModel.calculation(
                         KEY_IS_SELL_TYPE,
                         spinnerSell.selectedItemPosition,
                         spinnerReciver.selectedItemPosition,
                         s.toString().toDouble()
                     )
+                } else {
+                    etTextRecive.setText("")
                 }
 
             }
 
         })
 
-        editTextSell.addTextChangedListener(object : TextWatcher {
+        etTextRecive.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
                 Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
-            override fun afterTextChanged(s: Editable?) {
-                myViewModel.calculation(
-                    KEY_IS_RECEIVE_TYPE,
-                    spinnerSell.selectedItemPosition,
-                    spinnerReciver.selectedItemPosition,
-                    s.toString().toDouble()
-                )
+            override fun afterTextChanged(s: Editable) {
+                if (!s.equals("") && s.isNotEmpty()) {
+                    myViewModel.calculation(
+                        KEY_IS_RECEIVE_TYPE,
+                        spinnerSell.selectedItemPosition,
+                        spinnerReciver.selectedItemPosition,
+                        s.toString().toDouble()
+                    )
+                } else {
+                    editTextSell.setText("")
+                }
             }
 
         })
