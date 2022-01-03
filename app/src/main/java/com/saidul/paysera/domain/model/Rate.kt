@@ -4,9 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Balance(
+data class Rate(
     val currencyName: String,
-    val balance: Double,
+    val rate: Double,
     @PrimaryKey val id: Int? = null
 )
 

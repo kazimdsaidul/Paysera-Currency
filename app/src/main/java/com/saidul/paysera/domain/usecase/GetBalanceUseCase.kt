@@ -10,6 +10,5 @@ class GetBalanceUseCase(
 
     operator fun invoke(): Flow<List<Balance>> {
         return repository.getBalance()
-
     }
 }

@@ -2,7 +2,7 @@ package com.saidul.paysera.di
 
 import android.app.Application
 import androidx.room.Room
-import com.saidul.paysera.data.data_source.NoteDatabase
+import com.saidul.paysera.data.local.LocalDatabase
 import com.saidul.paysera.data.remote.ApiService
 import com.saidul.paysera.data.repository.CurrencyRepositoryImpl
 import com.saidul.paysera.domain.repository.CurrencyRepository
@@ -18,18 +18,18 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNoteDatabase(app: Application): NoteDatabase {
+    fun provideNoteDatabase(app: Application): LocalDatabase {
         return Room.databaseBuilder(
             app,
-            NoteDatabase::class.java,
-            NoteDatabase.DATABASE_NAME
+            LocalDatabase::class.java,
+            LocalDatabase.DATABASE_NAME
         ).build()
     }
 
     @Provides
     @Singleton
-    fun provideNoteRepository(db: NoteDatabase, apiService: ApiService): CurrencyRepository {
-        return CurrencyRepositoryImpl(db.noteDao, apiService)
+    fun provideNoteRepository(db: LocalDatabase, apiService: ApiService): CurrencyRepository {
+        return CurrencyRepositoryImpl(db.localDBDao, apiService)
     }
 
 }

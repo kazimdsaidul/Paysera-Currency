@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.saidul.paysera.R
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.presentation.adapter.AdapterBalance.MyView
-import java.text.DecimalFormat
+import com.saidul.paysera.utility.NumberFormatter.formatTwoDecimalNumber
 
 class AdapterBalance
     (
@@ -51,8 +51,7 @@ class AdapterBalance
     ) {
 
         val item = list[position]
-        val decimalFormat = DecimalFormat("#.##")
-        val twoDigitsF: Float = java.lang.Float.valueOf(decimalFormat.format(item.balance))
+        val twoDigitsF: Float = formatTwoDecimalNumber(item.balance)
 
 
         holder.textView.text = "${twoDigitsF} ${item.currencyName}"

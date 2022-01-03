@@ -1,9 +1,7 @@
 package com.saidul.paysera.di
 
 import com.saidul.paysera.domain.repository.CurrencyRepository
-import com.saidul.paysera.domain.usecase.CurrencyConvertUseCase
-import com.saidul.paysera.domain.usecase.CurrencyLatestUseCase
-import com.saidul.paysera.domain.usecase.GetBalanceUseCase
+import com.saidul.paysera.domain.usecase.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,8 +13,8 @@ import javax.inject.Singleton
 object UseCaseModule {
     @Provides
     @Singleton
-    fun provideNoteUseCases(repository: CurrencyRepository): CurrencyLatestUseCase {
-        return CurrencyLatestUseCase(
+    fun provideNoteUseCases(repository: CurrencyRepository): LatestCurrencyRateUseCase {
+        return LatestCurrencyRateUseCase(
             repository = repository
         )
     }
@@ -38,5 +36,22 @@ object UseCaseModule {
             repository = repository
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideDefaultBalanceAddUseCase(repository: CurrencyRepository): DefaultBalanceAddUseCase {
+        return DefaultBalanceAddUseCase(
+            repository = repository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetCalcuationUseCase(repository: CurrencyRepository): GetCalcuationUseCase {
+        return GetCalcuationUseCase(
+            repository = repository
+        )
+    }
+
 
 }
