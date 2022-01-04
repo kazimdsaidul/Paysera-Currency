@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 const val KEY_EXCHANGE_LIMIT = 5
 const val KEY_CHARGED = 0.7
 
-class CurrencyConvertUseCase(
+class CalculationAndConvertUseCase(
     private val repository: CurrencyRepository
 ) {
 

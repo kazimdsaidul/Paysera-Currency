@@ -22,8 +22,8 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideCurrencyConvertUseCase(repository: CurrencyRepository): CurrencyConvertUseCase {
-        return CurrencyConvertUseCase(
+    fun provideCurrencyConvertUseCase(repository: CurrencyRepository): CalculationAndConvertUseCase {
+        return CalculationAndConvertUseCase(
             repository = repository
         )
     }
@@ -47,8 +47,8 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetCalcuationUseCase(repository: CurrencyRepository): GetCalcuationUseCase {
-        return GetCalcuationUseCase(
+    fun provideGetCalcuationUseCase(repository: CurrencyRepository): CalculationUseCase {
+        return CalculationUseCase(
             repository = repository
         )
     }

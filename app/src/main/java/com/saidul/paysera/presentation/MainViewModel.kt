@@ -19,8 +19,8 @@ class MainViewModel @Inject constructor(
     val latestCurrencyRateUseCase: LatestCurrencyRateUseCase,
     val getBalanceUseCase: GetBalanceUseCase,
     val defaultBalanceAddUseCase: DefaultBalanceAddUseCase,
-    val getCalcuationUseCase: GetCalcuationUseCase,
-    val convertUseCase: CurrencyConvertUseCase
+    val calculationUseCase: CalculationUseCase,
+    val convertUseCase: CalculationAndConvertUseCase
 ) : ViewModel() {
 
     lateinit var currencyTypeList: List<Balance>
@@ -39,8 +39,8 @@ class MainViewModel @Inject constructor(
         return getBalanceUseCase.invoke()
     }
 
-    private val _convertAmount = MutableSharedFlow<Double>()
-    val convertAmount: SharedFlow<Double> = _convertAmount
+    private val _convertAmount = MutableSharedFlow<Resource<Any>>()
+    val convertAmount: SharedFlow<Resource<Any>> = _convertAmount
 
     private val _defaultBalanceAdded = MutableSharedFlow<Resource<Any>>()
     val defaultBalanceAdded: SharedFlow<Resource<Any>> = _defaultBalanceAdded
@@ -65,10 +65,9 @@ class MainViewModel @Inject constructor(
     ) {
 
         viewModelScope.launch {
-            getCalcuationUseCase.calculation(keyIsSellType, sellBalance, reciveBanalce, amount)
+            calculationUseCase.calculation(keyIsSellType, sellBalance, reciveBanalce, amount)
                 .collect {
                     _convertAmount.emit(it)
-
                 }
         }
 

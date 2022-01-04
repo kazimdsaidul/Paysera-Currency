@@ -11,6 +11,7 @@ import android.widget.AdapterView
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.saidul.paysera.R
 import com.saidul.paysera.core.Resource
 import com.saidul.paysera.core.base.BaseActivity
@@ -30,6 +31,7 @@ const val KEY_IS_SELL_TYPE = "KEY_IS_SELL_TYPE"
 class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
 
     private lateinit var customAdapterReceive: CustomDropDownAdapter
+    private lateinit var customAdapterSell: CustomDropDownAdapter
     private val myViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +56,7 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
                     tvCurrencyLabel.visibility = View.VISIBLE
                     btnSumbit.visibility = View.VISIBLE
 
-                    setAapter(it)
+                    setBalanceAdapter(it)
                     setSellerSpinner(it)
                     setReceiveSpinner(it)
                 } else {
@@ -77,7 +79,18 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
 
         lifecycleScope.launch {
             myViewModel.convertAmount.collect {
-                etTextRecive.setText("${NumberFormatter.formatTwoDecimalNumber(it)}")
+                if (it.status == Resource.Status.SUCCESS) {
+                    etTextRecive.setText("${NumberFormatter.formatTwoDecimalNumber(it.data as Double)}")
+                }
+
+                if (it.status == Resource.Status.FAILURE) {
+                    Snackbar.make(
+                        findViewById(android.R.id.content),
+                        it.message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    etTextRecive.setText("")
+                }
             }
         }
 
@@ -106,8 +119,8 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
         onlyFirstItemList.add(first)
         spinnerSell.onItemSelectedListener = this
 
-        val customAdapter = CustomDropDownAdapter(applicationContext, onlyFirstItemList)
-        spinnerSell.adapter = customAdapter
+        customAdapterSell = CustomDropDownAdapter(applicationContext, onlyFirstItemList)
+        spinnerSell.adapter = customAdapterSell
 
     }
 
@@ -155,15 +168,15 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
         if (s != "" && s.isNotEmpty()) {
 
             val balanceSell =
-                customAdapterReceive.getItem(spinnerSell.selectedItemPosition) as Balance
-            val balanceRecive =
+                customAdapterSell.getItem(spinnerSell.selectedItemPosition) as Balance
+            val balanceReceive =
                 customAdapterReceive.getItem(spinnerReciver.selectedItemPosition) as Balance
 
 
             myViewModel.calculation(
                 KEY_IS_SELL_TYPE,
                 balanceSell,
-                balanceRecive,
+                balanceReceive,
                 s.toDouble()
             )
         } else {
@@ -171,7 +184,7 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
-    fun setAapter(list: List<Balance>) {
+    private fun setBalanceAdapter(list: List<Balance>) {
 
         val recyclerViewLayoutManager = LinearLayoutManager(
             applicationContext

@@ -74,9 +74,7 @@ class CurrencyRepositoryImpl(
         dao.deleteBalanceData()
     }
 
-    override fun addLatestCurrency(data: java.util.HashMap<String, Double>?) {
 
-    }
 
     override suspend fun updateBalance(updateSellBalance: Balance) {
         dao.updateBalance(updateSellBalance)

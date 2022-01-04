@@ -17,7 +17,6 @@ interface CurrencyRepository {
     fun getBalance(sellCurrency: String): Flow<Balance>
     fun getRate(currency: String): Flow<Rate>
     suspend fun deleteBalanceData()
-    fun addLatestCurrency(data: java.util.HashMap<String, Double>?)
     suspend fun updateBalance(updateSellBalance: Balance)
     suspend fun addTransction(transaction: Transaction)
     fun getTransactionList(): Flow<List<Transaction>>
