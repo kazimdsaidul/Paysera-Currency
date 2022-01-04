@@ -7,7 +7,7 @@ import com.saidul.paysera.core.network.Result
 import com.saidul.paysera.data.local.LocalDBDao
 import com.saidul.paysera.data.remote.ApiService
 import com.saidul.paysera.data.remote.model.ResposLatest
-import com.saidul.paysera.di.ApiModule
+import com.saidul.paysera.di.APIModule
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.domain.model.Rate
 import com.saidul.paysera.domain.model.Transaction
@@ -24,7 +24,7 @@ class CurrencyRepositoryImpl(
 ) : BaseService(), CurrencyRepository {
     override suspend fun convert(from: String, to: String, amount: Double): Result<ResposLatest> {
         return createCall {
-            apiService.convert(ApiModule.API_TOKEN, from = from, to = to, amount = amount)
+            apiService.convert(APIModule.API_TOKEN, from = from, to = to, amount = amount)
         }
     }
 
@@ -32,7 +32,7 @@ class CurrencyRepositoryImpl(
         val rateHashMap = HashMap<String, Double>()
 
         val createCall = createCall {
-            apiService.latest(ApiModule.API_TOKEN)
+            apiService.latest(APIModule.API_TOKEN)
         }
         val rootJsonObject = JSONObject((createCall as Result.Success).data.string())
         val success = rootJsonObject.getBoolean(KEY_SUCCESS)
