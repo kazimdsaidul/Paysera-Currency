@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor(
         keyIsSellType: String,
         sellBalance: Balance,
         reciveBanalce: Balance,
-        amount: Double
+        amount: String
     ) {
 
         viewModelScope.launch {
@@ -87,8 +87,7 @@ class MainViewModel @Inject constructor(
         keyIsSellType: String,
         selectedItemPosition: Int,
         selectedItemPosition1: Int,
-        amount: Double,
-        convertyAmount: Double
+        amount: String,
     ) {
 
         val sellCurrency = currencyTypeList.get(selectedItemPosition).currencyName
@@ -99,8 +98,7 @@ class MainViewModel @Inject constructor(
                 keyIsSellType,
                 sellCurrency,
                 reciverCurrency,
-                amount,
-                convertyAmount
+                amount
             )
                 .collect {
                     _convertMessage.emit(it);
@@ -109,12 +107,13 @@ class MainViewModel @Inject constructor(
 
     }
 
-    fun repeatRequest(): Job {
+    private fun repeatRequest(): Job {
         return viewModelScope.launch {
             while (isActive) {
-                //do your request
-                Timber.e("")
-                delay(3000)
+
+                //getLatest()
+                Timber.e("//do your request")
+                delay(10000)
             }
         }
     }

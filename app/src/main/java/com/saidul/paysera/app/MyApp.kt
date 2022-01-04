@@ -11,6 +11,7 @@ class MyApp : Application() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+            Timber.e("test")
         }
     }
 }

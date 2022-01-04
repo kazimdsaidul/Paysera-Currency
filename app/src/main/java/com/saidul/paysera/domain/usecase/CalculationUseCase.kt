@@ -15,21 +15,29 @@ class CalculationUseCase(
         keyIsSellType: String,
         sellBalance: Balance,
         receiverBalance: Balance,
-        amount: Double
+        amount: String
     ): Flow<Resource<Any>> = flow {
 
-        val total: Double
-        if (keyIsSellType == KEY_IS_SELL_TYPE) {
-            val sellRate = repository.getRate(sellBalance.currencyName).first()
-            val reciveRate = repository.getRate(receiverBalance.currencyName).first()
-            total = reciveRate.rate * amount
+        try {
+            val total: Double
+            if (keyIsSellType == KEY_IS_SELL_TYPE) {
+                val sellRate = repository.getRate(sellBalance.currencyName).first()
+                val reciveRate = repository.getRate(receiverBalance.currencyName).first()
+                total = reciveRate.rate * amount.toDouble()
 
-            if (sellBalance.balance < amount) {
-                emit(Resource.failed(message = "Sell amount is not greater than current balance"))
-                return@flow
+                if (sellBalance.balance < amount.toDouble()) {
+                    emit(Resource.failed(message = "Sell amount is not greater than current balance"))
+                    return@flow
+                }
+
+                emit(Resource.success(data = total))
             }
-
-            emit(Resource.success(data = total))
+        } catch (ex: NumberFormatException) { // handle your exception
+            emit(Resource.failed(message = "Invalid number"))
+        } catch (e: Exception) {
+            emit(Resource.error(message = "Try again"))
         }
+
+
     }
 }

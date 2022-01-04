@@ -11,7 +11,6 @@ import android.widget.AdapterView
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.saidul.paysera.R
 import com.saidul.paysera.core.Resource
 import com.saidul.paysera.core.base.BaseActivity
@@ -38,14 +37,12 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        myViewModel.getLatest()
-
-        initiOwnViewState()
+        initOwnViewState()
         initialControls()
 
     }
 
-    private fun initiOwnViewState() {
+    private fun initOwnViewState() {
         lifecycleScope.launch {
             myViewModel.getBalanceList().collect {
                 myViewModel.currencyTypeList = it
@@ -83,24 +80,16 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
                     etTextRecive.setText("${NumberFormatter.formatTwoDecimalNumber(it.data as Double)}")
                 }
 
-                if (it.status == Resource.Status.FAILURE) {
-                    Snackbar.make(
-                        findViewById(android.R.id.content),
-                        it.message.toString(),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                    etTextRecive.setText("")
-                }
+                handleFailureAndError(it)
             }
         }
-
 
         lifecycleScope.launch {
             myViewModel.convertMessage.collect {
                 if (it.status == Resource.Status.SUCCESS) {
-                    showSimpleFailureDialog(title = "Currency converted",
+                    showSimpleFailureDialog(title = getString(R.string.currency_converted),
                         content = it.data.toString(),
-                        "Done",
+                        getString(R.string.done),
                         false,
                         object : PositiveCallBack {
                             override fun onClick() {
@@ -108,10 +97,22 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
                             }
                         })
                 }
-
+                handleFailureAndError(it)
             }
         }
     }
+
+    private fun handleFailureAndError(it: Resource<Any>) {
+        if (it.status == Resource.Status.FAILURE) {
+            showSnackBarMessage(it.message)
+            etTextRecive.setText("")
+        }
+        if (it.status == Resource.Status.ERROR) {
+            showSnackBarMessage(it.message)
+            etTextRecive.setText("")
+        }
+    }
+
 
     private fun setSellerSpinner(it: List<Balance>) {
         val first = it.first()
@@ -129,8 +130,6 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
         spinnerReciver.onItemSelectedListener = this
         customAdapterReceive = CustomDropDownAdapter(applicationContext, subList)
         spinnerReciver.adapter = customAdapterReceive
-
-
     }
 
     private fun initialControls() {
@@ -152,32 +151,33 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
         })
 
         btnSumbit.setOnClickListener {
-            myViewModel.submit(
-                KEY_IS_SELL_TYPE,
-                spinnerSell.selectedItemPosition,
-                spinnerReciver.selectedItemPosition,
-                editTextSell.text.toString().toDouble(),
-                etTextRecive.text.toString().toDouble()
-            )
+            if (editTextSell.text.isNotBlank()) {
+                myViewModel.submit(
+                    KEY_IS_SELL_TYPE,
+                    spinnerSell.selectedItemPosition,
+                    spinnerReciver.selectedItemPosition,
+                    editTextSell.text.toString(),
+                )
+            } else {
+                showSnackBarMessage("Invalid input")
+            }
+
+
         }
     }
 
     private fun calculation(s: String) {
-
-
-        if (s != "" && s.isNotEmpty()) {
-
+        if (s.isNotEmpty()) {
             val balanceSell =
                 customAdapterSell.getItem(spinnerSell.selectedItemPosition) as Balance
             val balanceReceive =
                 customAdapterReceive.getItem(spinnerReciver.selectedItemPosition) as Balance
 
-
             myViewModel.calculation(
                 KEY_IS_SELL_TYPE,
                 balanceSell,
                 balanceReceive,
-                s.toDouble()
+                amount = s
             )
         } else {
             etTextRecive.setText("")
@@ -185,23 +185,18 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private fun setBalanceAdapter(list: List<Balance>) {
-
         val recyclerViewLayoutManager = LinearLayoutManager(
             applicationContext
         )
-
         rvBalanceList.layoutManager = recyclerViewLayoutManager
 
         val adapter = AdapterBalance(list)
-
-
         val horizontalLayout = LinearLayoutManager(
             this@MainActivity,
             LinearLayoutManager.HORIZONTAL,
             false
         )
         rvBalanceList.layoutManager = horizontalLayout
-
         rvBalanceList.adapter = adapter
     }
 

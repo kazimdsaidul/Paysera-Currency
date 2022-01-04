@@ -7,4 +7,6 @@
     <string name="sell">Sell</string>
     <string name="receive">Receive</string>
     <string name="enter_your_amount_hare">Amount</string>
+    <string name="currency_converted">Currency converted</string>
+    <string name="done">Done</string>
 </resources>
