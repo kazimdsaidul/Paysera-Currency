@@ -7,11 +7,15 @@ import com.saidul.paysera.core.Resource
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +30,13 @@ class MainViewModel @Inject constructor(
     lateinit var currencyTypeList: List<Balance>
     private val _latestCurrencyFlow = MutableSharedFlow<Resource<Any>>()
     val latestCurrency: SharedFlow<Resource<Any>> = _latestCurrencyFlow
+
+    var repeatJob: Job? = null
+
+    init {
+        //start the loop
+        repeatJob = repeatRequest()
+    }
 
     fun getLatest() {
         viewModelScope.launch {
@@ -97,5 +108,22 @@ class MainViewModel @Inject constructor(
         }
 
     }
+
+    fun repeatRequest(): Job {
+        return viewModelScope.launch {
+            while (isActive) {
+                //do your request
+                Timber.e("")
+                delay(3000)
+            }
+        }
+    }
+
+
+    override fun onCleared() {
+        repeatJob?.cancel()
+        super.onCleared()
+    }
+
 
 }
