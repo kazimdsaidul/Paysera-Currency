@@ -13,19 +13,15 @@ class GetCalcuationUseCase(
         sellCurrency: String,
         reciverCurrency: String,
         amount: Double
-    ) = flow<Double> {
+    ) = flow {
 
         var total = 0.0
         if (keyIsSellType == KEY_IS_SELL_TYPE) {
             val sellRate = repository.getRate(sellCurrency).first()
             val reciveRate = repository.getRate(reciverCurrency).first()
-            total = reciveRate.rate * amount;
+            total = reciveRate.rate * amount
             emit(total)
 
         }
-
-
     }
-
-
 }

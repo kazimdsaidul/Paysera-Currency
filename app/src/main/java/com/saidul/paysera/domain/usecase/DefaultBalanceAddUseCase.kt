@@ -21,8 +21,8 @@ class DefaultBalanceAddUseCase(val repository: CurrencyRepository) {
                 emit(Resource.success(data = true))
             } catch (e: Exception) {
                 emit(Resource.error(e.localizedMessage, e))
-            } as Unit
-        } as Flow<Resource<Any>>
+            }
+        }
 
     private suspend fun insertDefalutData(defalutList: List<Balance>) {
         return repository.insertBalances(dataList = defalutList)

@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saidul.paysera.core.Resource
 import com.saidul.paysera.domain.model.Balance
-import com.saidul.paysera.domain.usecase.*
+import com.saidul.paysera.domain.usecase.DefaultBalanceAddUseCase
+import com.saidul.paysera.domain.usecase.GetBalanceUseCase
+import com.saidul.paysera.domain.usecase.GetCalcuationUseCase
+import com.saidul.paysera.domain.usecase.LatestCurrencyRateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val latestCurrencyRateUseCase: LatestCurrencyRateUseCase,
-    val currencyConvertUseCase: CurrencyConvertUseCase,
     val getBalanceUseCase: GetBalanceUseCase,
     val defaultBalanceAddUseCase: DefaultBalanceAddUseCase,
     val getCalcuationUseCase: GetCalcuationUseCase
@@ -31,14 +33,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             latestCurrencyRateUseCase.invoke().collect {
                 _latestCurrencyFlow.emit(it)
-            }
-        }
-    }
-
-    fun convert(from: String, to: String, amount: Double) {
-        viewModelScope.launch {
-            currencyConvertUseCase.invoke(from = from, to = to, amount = amount).collect {
-
             }
         }
     }

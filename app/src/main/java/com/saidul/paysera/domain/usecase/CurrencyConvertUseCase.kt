@@ -17,6 +17,6 @@ class CurrencyConvertUseCase(
             emit(Resource.success(data = latest))
         } catch (e: Exception) {
             emit(Resource.error(e.localizedMessage, e))
-        } as Unit
-    } as Flow<Resource<Any>>
+        }
+    }
 }

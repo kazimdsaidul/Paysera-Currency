@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ApiModule {
     private const val BASE_URL = "http://api.exchangeratesapi.io/v1/"
-    public const val API_TOKEN = "2b2a8a13313f4d38fc577a36d71bf496"
+    const val API_TOKEN = "2b2a8a13313f4d38fc577a36d71bf496"
 
     @Singleton
     @Provides
@@ -38,7 +38,7 @@ object ApiModule {
             build.addInterceptor(OkHttpProfilerInterceptor())
         }
 
-        return build.build();
+        return build.build()
     }
 
 
