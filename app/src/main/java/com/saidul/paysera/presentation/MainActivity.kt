@@ -1,47 +1,43 @@
 package com.saidul.paysera.presentation
 
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.saidul.paysera.core.Resource
+import com.saidul.paysera.R
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.presentation.adapter.AdapterBalance
 import com.saidul.paysera.presentation.adapter.CustomDropDownAdapter
 import com.saidul.paysera.utility.NumberFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.item_balaces.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 const val KEY_IS_SELL_TYPE = "KEY_IS_SELL_TYPE"
-const val KEY_IS_RECEIVE_TYPE = "KEY_IS_RECIVE_TYPE"
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
-
-    private lateinit var recyclerView: RecyclerView
     private val myViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.saidul.paysera.R.layout.activity_main)
-
+        setContentView(R.layout.activity_main)
 
         myViewModel.getLatest()
 
-
         initiOwnViewState()
         initialControls()
-
 
     }
 
@@ -49,45 +45,37 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         lifecycleScope.launch {
             myViewModel.getBalanceList().collect {
                 myViewModel.currencyTypeList = it
-                setAapter(it)
-                setSellerSpiner(it)
-                setReceiveSpiner(it)
+                if (it.isNotEmpty()) {
+                    textViewMyBalances.text = getString(R.string.my_balances)
+                    cLSell.visibility = View.VISIBLE
+                    clRecive.visibility = View.VISIBLE
+                    tvCurrencyLabel.visibility = View.VISIBLE
+                    btnSumbit.visibility = View.VISIBLE
+
+                    setAapter(it)
+                    setSellerSpiner(it)
+                    setReceiveSpiner(it)
+                } else {
+                    textViewMyBalances.text = getString(R.string.click_to_show_balances)
+                    cLSell.visibility = View.GONE
+                    clRecive.visibility = View.GONE
+                    tvCurrencyLabel.visibility = View.GONE
+                    btnSumbit.visibility = View.GONE
+
+                    runOnUiThread {
+                        editTextSell.requestFocus()
+                        val imm: InputMethodManager =
+                            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.showSoftInput(editTextSell, InputMethodManager.SHOW_IMPLICIT)
+                    }
+
+                }
             }
-
-
         }
 
         lifecycleScope.launch {
             myViewModel.convertAmount.collect {
-                etTextRecive.setText("" + NumberFormatter.formatTwoDecimalNumber(it))
-            }
-        }
-
-
-
-
-
-
-
-
-
-        lifecycleScope.launch {
-
-            myViewModel.latestCurrency.collect {
-                if (it.status == Resource.Status.SUCCESS) {
-
-                }
-
-                if (it.status == Resource.Status.FAILURE) {
-//                    when (it.data) {
-//
-//                        else -> {
-//                            dismissProgressDialog()
-//                            showSimpleFailureDialogNewV2(it.message ?: "")
-//                        }
-//                    }
-                }
-
+                etTextRecive.setText("${NumberFormatter.formatTwoDecimalNumber(it)}")
             }
         }
     }
@@ -106,9 +94,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private fun setReceiveSpiner(it: List<Balance>) {
         spinnerReciver.onItemSelectedListener = this
-
         val customAdapter = CustomDropDownAdapter(applicationContext, it)
         spinnerReciver.adapter = customAdapter
+
     }
 
     private fun initialControls() {
@@ -124,69 +112,49 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
             override fun afterTextChanged(s: Editable) {
-                if (!s.equals("") && s.isNotEmpty()) {
-                    myViewModel.calculation(
-                        KEY_IS_SELL_TYPE,
-                        spinnerSell.selectedItemPosition,
-                        spinnerReciver.selectedItemPosition,
-                        s.toString().toDouble()
-                    )
-                } else {
-                    etTextRecive.setText("")
-                }
-
-            }
-
-        })
-
-        etTextRecive.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
-                Unit
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-
-            override fun afterTextChanged(s: Editable) {
-                if (!s.equals("") && s.isNotEmpty()) {
-                    myViewModel.calculation(
-                        KEY_IS_RECEIVE_TYPE,
-                        spinnerSell.selectedItemPosition,
-                        spinnerReciver.selectedItemPosition,
-                        s.toString().toDouble()
-                    )
-                } else {
-                    editTextSell.setText("")
-                }
+                calculation(s.toString())
             }
 
         })
     }
 
+    private fun calculation(s: String) {
+        if (s != "" && s.isNotEmpty()) {
+            myViewModel.calculation(
+                KEY_IS_SELL_TYPE,
+                spinnerSell.selectedItemPosition,
+                spinnerReciver.selectedItemPosition,
+                s.toDouble()
+            )
+        } else {
+            etTextRecive.setText("")
+        }
+    }
+
     fun setAapter(list: List<Balance>) {
 
-        val RecyclerViewLayoutManager = LinearLayoutManager(
+        val recyclerViewLayoutManager = LinearLayoutManager(
             applicationContext
         )
 
-        rvBalanceList.layoutManager = RecyclerViewLayoutManager
+        rvBalanceList.layoutManager = recyclerViewLayoutManager
 
         val adapter = AdapterBalance(list)
 
 
-        val HorizontalLayout = LinearLayoutManager(
+        val horizontalLayout = LinearLayoutManager(
             this@MainActivity,
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        rvBalanceList.layoutManager = HorizontalLayout
+        rvBalanceList.layoutManager = horizontalLayout
 
         rvBalanceList.adapter = adapter
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-
+        calculation(editTextSell.text.toString())
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-    }
+    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 }
