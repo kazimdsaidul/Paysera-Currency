@@ -15,8 +15,7 @@ https://gist.github.com/PayseraGithub/fbee2c2398c7e464174d149833e1f7eb
   <img src="https://user-images.githubusercontent.com/7722028/148052585-e3a358d2-ba2c-4637-9a21-2e76af127735.jpg" width="200">
   <img src="https://user-images.githubusercontent.com/7722028/148052487-6c83d18f-a87e-49fd-9a02-2401bf5bd99a.jpg" width="200">
 </p>
-  
-</p>
+
 <br>
 <br>
 
