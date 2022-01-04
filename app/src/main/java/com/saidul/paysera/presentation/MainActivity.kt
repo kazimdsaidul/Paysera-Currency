@@ -152,10 +152,16 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
 
         btnSumbit.setOnClickListener {
             if (editTextSell.text.isNotBlank()) {
+
+                val balanceSell =
+                    customAdapterSell.getItem(spinnerSell.selectedItemPosition) as Balance
+                val balanceReceive =
+                    customAdapterReceive.getItem(spinnerReciver.selectedItemPosition) as Balance
+
                 myViewModel.submit(
                     KEY_IS_SELL_TYPE,
-                    spinnerSell.selectedItemPosition,
-                    spinnerReciver.selectedItemPosition,
+                    balanceSell,
+                    balanceReceive,
                     editTextSell.text.toString(),
                 )
             } else {

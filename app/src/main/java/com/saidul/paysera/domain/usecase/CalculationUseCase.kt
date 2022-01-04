@@ -21,12 +21,18 @@ class CalculationUseCase(
         try {
             val total: Double
             if (keyIsSellType == KEY_IS_SELL_TYPE) {
+
+                if (amount.toDouble() <= 0.0) {
+                    emit(Resource.failed(message = "Amount is less than zero"))
+                    return@flow
+                }
+
                 val sellRate = repository.getRate(sellBalance.currencyName).first()
-                val reciveRate = repository.getRate(receiverBalance.currencyName).first()
-                total = reciveRate.rate * amount.toDouble()
+                val receiveRate = repository.getRate(receiverBalance.currencyName).first()
+                total = receiveRate.rate * amount.toDouble()
 
                 if (sellBalance.balance < amount.toDouble()) {
-                    emit(Resource.failed(message = "Sell amount is not greater than current balance"))
+                    emit(Resource.failed(message = "Amount is not greater than current balance"))
                     return@flow
                 }
 

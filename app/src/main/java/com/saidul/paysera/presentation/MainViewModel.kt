@@ -85,19 +85,16 @@ class MainViewModel @Inject constructor(
 
     fun submit(
         keyIsSellType: String,
-        selectedItemPosition: Int,
-        selectedItemPosition1: Int,
+        balanceSell: Balance,
+        balanceReceive: Balance,
         amount: String,
     ) {
-
-        val sellCurrency = currencyTypeList.get(selectedItemPosition).currencyName
-        val reciverCurrency = currencyTypeList.get(selectedItemPosition1).currencyName
 
         viewModelScope.launch {
             convertUseCase.invoke(
                 keyIsSellType,
-                sellCurrency,
-                reciverCurrency,
+                balanceSell,
+                balanceReceive,
                 amount
             )
                 .collect {
