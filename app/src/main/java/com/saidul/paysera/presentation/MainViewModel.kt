@@ -1,6 +1,5 @@
 package com.saidul.paysera.presentation
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saidul.paysera.core.Resource
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,12 +65,12 @@ class MainViewModel @Inject constructor(
     fun calculation(
         keyIsSellType: String,
         sellBalance: Balance,
-        reciveBanalce: Balance,
+        receiveBalance: Balance,
         amount: String
     ) {
 
         viewModelScope.launch {
-            calculationUseCase.calculation(keyIsSellType, sellBalance, reciveBanalce, amount)
+            calculationUseCase.calculation(keyIsSellType, sellBalance, receiveBalance, amount)
                 .collect {
                     _convertAmount.emit(it)
                 }
@@ -98,7 +96,7 @@ class MainViewModel @Inject constructor(
                 amount
             )
                 .collect {
-                    _convertMessage.emit(it);
+                    _convertMessage.emit(it)
                 }
         }
 
@@ -107,9 +105,7 @@ class MainViewModel @Inject constructor(
     private fun repeatRequest(): Job {
         return viewModelScope.launch {
             while (isActive) {
-
-                //getLatest()
-                Timber.e("//do your request")
+                getLatest()
                 delay(10000)
             }
         }
