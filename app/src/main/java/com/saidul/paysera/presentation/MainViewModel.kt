@@ -46,12 +46,8 @@ class MainViewModel @Inject constructor(
     val defaultBalanceAdded: SharedFlow<Resource<Any>> = _defaultBalanceAdded
     fun addDefaultBalance() {
         viewModelScope.launch {
-            val data = mutableListOf<Balance>()
-            data.add(Balance("EUR", 1000.00))
-            data.add(Balance("USD", 0.00))
-            data.add(Balance("JPY", 0.00))
-            data.add(Balance("GBP", 0.00))
-            defaultBalanceAddUseCase.invoke(true, data).collect {
+
+            defaultBalanceAddUseCase.invoke(true).collect {
                 _defaultBalanceAdded.emit(it)
             }
         }

@@ -7,16 +7,24 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class DefaultBalanceAddUseCase(val repository: CurrencyRepository) {
-    operator fun invoke(isNeedClearData: Boolean, defalutList: List<Balance>): Flow<Resource<Any>> =
+    operator fun invoke(isNeedClearData: Boolean): Flow<Resource<Any>> =
         flow {
+
+            val defaultList = mutableListOf<Balance>()
+            defaultList.add(Balance("EUR", 1000.00))
+            defaultList.add(Balance("USD", 0.00))
+            defaultList.add(Balance("JPY", 0.00))
+            defaultList.add(Balance("GBP", 0.00))
+
+
             try {
                 emit(Resource.loading(true))
                 if (isNeedClearData) {
                     repository.deleteBalanceData()
                     repository.deleteTranstion()
-                    insertDefalutData(defalutList)
+                    insertDefalutData(defaultList)
                 } else {
-                    insertDefalutData(defalutList)
+                    insertDefalutData(defaultList)
                 }
                 emit(Resource.loading(false))
                 emit(Resource.success(data = true))
