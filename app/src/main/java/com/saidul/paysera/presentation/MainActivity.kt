@@ -9,10 +9,11 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.saidul.paysera.R
+import com.saidul.paysera.core.Resource
+import com.saidul.paysera.core.base.BaseActivity
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.presentation.adapter.AdapterBalance
 import com.saidul.paysera.presentation.adapter.CustomDropDownAdapter
@@ -26,8 +27,9 @@ import kotlinx.coroutines.launch
 const val KEY_IS_SELL_TYPE = "KEY_IS_SELL_TYPE"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
 
+    private lateinit var customAdapterReceive: CustomDropDownAdapter
     private val myViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +55,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     btnSumbit.visibility = View.VISIBLE
 
                     setAapter(it)
-                    setSellerSpiner(it)
-                    setReceiveSpiner(it)
+                    setSellerSpinner(it)
+                    setReceiveSpinner(it)
                 } else {
                     textViewMyBalances.text = getString(R.string.click_to_show_balances)
                     cLSell.visibility = View.GONE
@@ -78,10 +80,27 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 etTextRecive.setText("${NumberFormatter.formatTwoDecimalNumber(it)}")
             }
         }
+
+
+        lifecycleScope.launch {
+            myViewModel.convertMessage.collect {
+                if (it.status == Resource.Status.SUCCESS) {
+                    showSimpleFailureDialog(title = "Currency converted",
+                        content = it.data.toString(),
+                        "Done",
+                        false,
+                        object : PositiveCallBack {
+                            override fun onClick() {
+                                editTextSell.setText("")
+                            }
+                        })
+                }
+
+            }
+        }
     }
 
-
-    private fun setSellerSpiner(it: List<Balance>) {
+    private fun setSellerSpinner(it: List<Balance>) {
         val first = it.first()
         val onlyFirstItemList = mutableListOf<Balance>()
         onlyFirstItemList.add(first)
@@ -92,10 +111,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     }
 
-    private fun setReceiveSpiner(it: List<Balance>) {
+    private fun setReceiveSpinner(it: List<Balance>) {
+        val subList = it.subList(1, it.size)
         spinnerReciver.onItemSelectedListener = this
-        val customAdapter = CustomDropDownAdapter(applicationContext, it)
-        spinnerReciver.adapter = customAdapter
+        customAdapterReceive = CustomDropDownAdapter(applicationContext, subList)
+        spinnerReciver.adapter = customAdapterReceive
+
 
     }
 
@@ -116,14 +137,33 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
 
         })
-    }
 
-    private fun calculation(s: String) {
-        if (s != "" && s.isNotEmpty()) {
-            myViewModel.calculation(
+        btnSumbit.setOnClickListener {
+            myViewModel.submit(
                 KEY_IS_SELL_TYPE,
                 spinnerSell.selectedItemPosition,
                 spinnerReciver.selectedItemPosition,
+                editTextSell.text.toString().toDouble(),
+                etTextRecive.text.toString().toDouble()
+            )
+        }
+    }
+
+    private fun calculation(s: String) {
+
+
+        if (s != "" && s.isNotEmpty()) {
+
+            val balanceSell =
+                customAdapterReceive.getItem(spinnerSell.selectedItemPosition) as Balance
+            val balanceRecive =
+                customAdapterReceive.getItem(spinnerReciver.selectedItemPosition) as Balance
+
+
+            myViewModel.calculation(
+                KEY_IS_SELL_TYPE,
+                balanceSell,
+                balanceRecive,
                 s.toDouble()
             )
         } else {

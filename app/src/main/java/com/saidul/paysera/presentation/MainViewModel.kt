@@ -5,10 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saidul.paysera.core.Resource
 import com.saidul.paysera.domain.model.Balance
-import com.saidul.paysera.domain.usecase.DefaultBalanceAddUseCase
-import com.saidul.paysera.domain.usecase.GetBalanceUseCase
-import com.saidul.paysera.domain.usecase.GetCalcuationUseCase
-import com.saidul.paysera.domain.usecase.LatestCurrencyRateUseCase
+import com.saidul.paysera.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +19,8 @@ class MainViewModel @Inject constructor(
     val latestCurrencyRateUseCase: LatestCurrencyRateUseCase,
     val getBalanceUseCase: GetBalanceUseCase,
     val defaultBalanceAddUseCase: DefaultBalanceAddUseCase,
-    val getCalcuationUseCase: GetCalcuationUseCase
+    val getCalcuationUseCase: GetCalcuationUseCase,
+    val convertUseCase: CurrencyConvertUseCase
 ) : ViewModel() {
 
     lateinit var currencyTypeList: List<Balance>
@@ -44,26 +42,6 @@ class MainViewModel @Inject constructor(
     private val _convertAmount = MutableSharedFlow<Double>()
     val convertAmount: SharedFlow<Double> = _convertAmount
 
-    fun calculation(
-        keyIsSellType: String,
-        selectedItemPosition: Int,
-        selectedItemPosition1: Int,
-        amount: Double
-    ) {
-        val sellCurrency = currencyTypeList.get(selectedItemPosition).currencyName
-        val reciverCurrency = currencyTypeList.get(selectedItemPosition1).currencyName
-
-        viewModelScope.launch {
-            getCalcuationUseCase.calculation(keyIsSellType, sellCurrency, reciverCurrency, amount)
-                .collect {
-                    _convertAmount.emit(it)
-
-                }
-        }
-
-    }
-
-
     private val _defaultBalanceAdded = MutableSharedFlow<Resource<Any>>()
     val defaultBalanceAdded: SharedFlow<Resource<Any>> = _defaultBalanceAdded
     fun addDefaultBalance() {
@@ -77,6 +55,52 @@ class MainViewModel @Inject constructor(
                 _defaultBalanceAdded.emit(it)
             }
         }
+    }
+
+    fun calculation(
+        keyIsSellType: String,
+        sellBalance: Balance,
+        reciveBanalce: Balance,
+        amount: Double
+    ) {
+
+        viewModelScope.launch {
+            getCalcuationUseCase.calculation(keyIsSellType, sellBalance, reciveBanalce, amount)
+                .collect {
+                    _convertAmount.emit(it)
+
+                }
+        }
+
+    }
+
+    private val _convertMessage = MutableSharedFlow<Resource<Any>>()
+    val convertMessage: SharedFlow<Resource<Any>> = _convertMessage
+
+    fun submit(
+        keyIsSellType: String,
+        selectedItemPosition: Int,
+        selectedItemPosition1: Int,
+        amount: Double,
+        convertyAmount: Double
+    ) {
+
+        val sellCurrency = currencyTypeList.get(selectedItemPosition).currencyName
+        val reciverCurrency = currencyTypeList.get(selectedItemPosition1).currencyName
+
+        viewModelScope.launch {
+            convertUseCase.invoke(
+                keyIsSellType,
+                sellCurrency,
+                reciverCurrency,
+                amount,
+                convertyAmount
+            )
+                .collect {
+                    _convertMessage.emit(it);
+                }
+        }
+
     }
 
 }

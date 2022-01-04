@@ -10,6 +10,7 @@ import com.saidul.paysera.data.remote.model.ResposLatest
 import com.saidul.paysera.di.ApiModule
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.domain.model.Rate
+import com.saidul.paysera.domain.model.Transaction
 import com.saidul.paysera.domain.repository.CurrencyRepository
 import kotlinx.coroutines.flow.Flow
 import org.json.JSONObject
@@ -57,8 +58,12 @@ class CurrencyRepositoryImpl(
         dao.insertBalance(data)
     }
 
-    override fun getBalance(): Flow<List<Balance>> {
+    override fun getBalanceList(): Flow<List<Balance>> {
         return dao.getBalance()
+    }
+
+    override fun getBalance(sellCurrency: String): Flow<Balance> {
+        return dao.getBalance(sellCurrency)
     }
 
     override fun getRate(currency: String): Flow<Rate> {
@@ -71,6 +76,22 @@ class CurrencyRepositoryImpl(
 
     override fun addLatestCurrency(data: java.util.HashMap<String, Double>?) {
 
+    }
+
+    override suspend fun updateBalance(updateSellBalance: Balance) {
+        dao.updateBalance(updateSellBalance)
+    }
+
+    override suspend fun addTransction(transaction: Transaction) {
+        dao.addTransction(transaction)
+    }
+
+    override fun getTransactionList(): Flow<List<Transaction>> {
+        return dao.getTransction()
+    }
+
+    override suspend fun deleteTranstion() {
+        dao.deleteTranstion()
     }
 
 

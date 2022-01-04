@@ -1,16 +1,15 @@
 package com.saidul.paysera.data.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.domain.model.Rate
+import com.saidul.paysera.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocalDBDao {
 
+    // Balance table CRUD operation
     @Query("SELECT * FROM Balance")
     fun getBalance(): Flow<List<Balance>>
 
@@ -26,7 +25,14 @@ interface LocalDBDao {
     @Query("DELETE FROM Balance")
     suspend fun deleteBalanceData()
 
+    @Query("SELECT * FROM Balance WHERE currencyName = :currency")
+    fun getBalance(currency: String): Flow<Balance>
 
+    @Update(entity = Balance::class)
+    suspend fun updateBalance(updateSellBalance: Balance)
+
+
+    // Rate table CRUD operation
     @Query("SELECT * FROM Rate")
     fun getRates(): Flow<List<Rate>>
 
@@ -44,5 +50,17 @@ interface LocalDBDao {
 
     @Query("DELETE FROM Rate")
     suspend fun deleteRateData()
+
+
+    // Transaction table CRUD operation
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addTransction(balance: Transaction)
+
+    @Query("SELECT * FROM `Transaction`")
+    fun getTransction(): Flow<List<Transaction>>
+
+    @Query("DELETE FROM `Transaction`")
+    suspend fun deleteTranstion()
+
 
 }
