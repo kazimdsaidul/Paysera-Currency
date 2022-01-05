@@ -21,7 +21,7 @@ class DefaultBalanceAddUseCase(val repository: CurrencyRepository) {
                 emit(Resource.loading(true))
                 if (isNeedClearData) {
                     repository.deleteBalanceData()
-                    repository.deleteTranstion()
+                    repository.deleteTransition()
                     insertDefalutData(defaultList)
                 } else {
                     insertDefalutData(defaultList)

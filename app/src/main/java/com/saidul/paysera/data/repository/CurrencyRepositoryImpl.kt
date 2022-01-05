@@ -80,16 +80,16 @@ class CurrencyRepositoryImpl(
         dao.updateBalance(updateSellBalance)
     }
 
-    override suspend fun addTransction(transaction: Transaction) {
-        dao.addTransction(transaction)
+    override suspend fun addTransaction(transaction: Transaction) {
+        dao.addTransaction(transaction)
     }
 
     override fun getTransactionList(): Flow<List<Transaction>> {
-        return dao.getTransction()
+        return dao.getTransaction()
     }
 
-    override suspend fun deleteTranstion() {
-        dao.deleteTranstion()
+    override suspend fun deleteTransition() {
+        dao.deleteTransition()
     }
 
 

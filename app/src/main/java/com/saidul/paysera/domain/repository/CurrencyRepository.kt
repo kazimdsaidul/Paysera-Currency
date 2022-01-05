@@ -16,8 +16,8 @@ interface CurrencyRepository {
     suspend fun deleteBalanceData()
     fun isRowIsExistRate(): Flow<Boolean>
     suspend fun updateBalance(updateSellBalance: Balance)
-    suspend fun addTransction(transaction: Transaction)
+    suspend fun addTransaction(transaction: Transaction)
     fun getTransactionList(): Flow<List<Transaction>>
-    suspend fun deleteTranstion()
+    suspend fun deleteTransition()
 
 }

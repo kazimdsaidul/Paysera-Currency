@@ -35,7 +35,7 @@ class CalculationAndConvertUseCase(
                 }
 
                 val isRowIsExistRate = repository.isRowIsExistRate().first()
-                if (isRowIsExistRate == false) {
+                if (!isRowIsExistRate) {
                     emit(Resource.error(message = "Check your internet connection"))
                     return@flow
                 }
@@ -82,7 +82,7 @@ class CalculationAndConvertUseCase(
                     currentBalance = currentBalance,
                     commissionFee = transtionFeee
                 )
-                repository.addTransction(transaction)
+                repository.addTransaction(transaction)
 
 
                 val message =
