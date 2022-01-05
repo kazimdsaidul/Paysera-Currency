@@ -6,7 +6,6 @@ import com.saidul.paysera.core.Resource
 import com.saidul.paysera.core.network.Result
 import com.saidul.paysera.data.local.LocalDBDao
 import com.saidul.paysera.data.remote.ApiService
-import com.saidul.paysera.data.remote.model.ResposLatest
 import com.saidul.paysera.di.APIModule
 import com.saidul.paysera.domain.model.Balance
 import com.saidul.paysera.domain.model.Rate
@@ -22,11 +21,6 @@ const val KEY_RATES = "rates"
 class CurrencyRepositoryImpl(
     private val dao: LocalDBDao, private val apiService: ApiService
 ) : BaseService(), CurrencyRepository {
-    override suspend fun convert(from: String, to: String, amount: Double): Result<ResposLatest> {
-        return createCall {
-            apiService.convert(APIModule.API_TOKEN, from = from, to = to, amount = amount)
-        }
-    }
 
     override suspend fun latest(): Resource<HashMap<String, Double>> {
         val rateHashMap = HashMap<String, Double>()
