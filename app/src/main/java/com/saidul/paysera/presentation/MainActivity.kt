@@ -100,6 +100,14 @@ class MainActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
                 handleFailureAndError(it)
             }
         }
+
+        lifecycleScope.launch {
+            myViewModel.latestCurrency.collect {
+                handleFailureAndError(it)
+            }
+        }
+
+
     }
 
     private fun handleFailureAndError(it: Resource<Any>) {
