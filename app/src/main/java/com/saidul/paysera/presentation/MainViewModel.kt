@@ -36,7 +36,7 @@ class MainViewModel @Inject constructor(
         repeatJob = repeatRequest()
     }
 
-    fun getLatest() {
+    private fun getLatestCurrencyRateFromAPI() {
         viewModelScope.launch {
             latestCurrencyRateUseCase.invoke().collect {
                 _latestCurrencyFlow.emit(it)
@@ -105,7 +105,7 @@ class MainViewModel @Inject constructor(
     private fun repeatRequest(): Job {
         return viewModelScope.launch {
             while (isActive) {
-                getLatest()
+                getLatestCurrencyRateFromAPI()
                 delay(5000)
             }
         }

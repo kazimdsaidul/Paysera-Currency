@@ -57,13 +57,13 @@ interface LocalDBDao {
 
     // Transaction table CRUD operation
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addTransction(balance: Transaction)
+    suspend fun addTransaction(balance: Transaction)
 
     @Query("SELECT * FROM `Transaction`")
-    fun getTransction(): Flow<List<Transaction>>
+    fun getTransaction(): Flow<List<Transaction>>
 
     @Query("DELETE FROM `Transaction`")
-    suspend fun deleteTranstion()
+    suspend fun deleteTransition()
 
 
 }
