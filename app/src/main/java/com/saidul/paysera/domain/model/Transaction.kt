@@ -7,9 +7,8 @@ import androidx.room.PrimaryKey
 data class Transaction(
     val toCurrency: String,
     val fromCurrency: String,
-    val toAmount: Double,
-    val fromAmount: Double,
-//    val date: Date,
+    val amount: Double,
+    val previousBanlace: Double,
     val currentBalance: Double,
     val commissionFee: Double,
 

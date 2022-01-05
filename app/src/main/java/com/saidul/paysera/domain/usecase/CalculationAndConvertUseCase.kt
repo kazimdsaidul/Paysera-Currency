@@ -25,7 +25,7 @@ class CalculationAndConvertUseCase(
 
         ): Flow<Resource<Any>> = flow {
         try {
-            val total: Double
+            val totalConvertAmount: Double
             var transtionFeee = 0.0
             if (keyIsSellType == KEY_IS_SELL_TYPE) {
 
@@ -46,7 +46,7 @@ class CalculationAndConvertUseCase(
                 val sellRate = repository.getRate(sellCurrency.currencyName).first()
                 val receiveRate = repository.getRate(receiverCurrency.currencyName).first()
 
-                total = receiveRate.rate * amount.toDouble()
+                totalConvertAmount = receiveRate.rate * amount.toDouble()
 
                 if (sellBalance.balance < amount.toDouble()) {
                     emit(Resource.failed(message = "Sell amount is not greater than current balance"))
@@ -54,18 +54,19 @@ class CalculationAndConvertUseCase(
                 }
 
                 if (transactionSize >= KEY_EXCHANGE_LIMIT) {
-                    transtionFeee = ((KEY_CHARGED / total) * 100)
+                    transtionFeee = ((KEY_CHARGED * totalConvertAmount) / 100)
                 }
 
+                val currentBalance = sellBalance.balance - (totalConvertAmount - transtionFeee)
                 // update balance
                 val updateSellBalance = Balance(
                     currencyName = sellCurrency.currencyName,
-                    balance = sellBalance.balance - amount.toDouble(),
+                    balance = currentBalance,
                     id = sellBalance.id
                 )
                 val updateReciverBalance = Balance(
                     currencyName = receiverCurrency.currencyName,
-                    balance = receiverBalance.balance + (total - transtionFeee),
+                    balance = receiverBalance.balance + totalConvertAmount,
                     id = receiverBalance.id
                 )
 
@@ -74,11 +75,11 @@ class CalculationAndConvertUseCase(
 
                 // add transaction history
                 val transaction = Transaction(
-                    toCurrency = sellCurrency.currencyName,
-                    fromCurrency = receiverCurrency.currencyName,
-                    toAmount = sellBalance.balance,
-                    fromAmount = receiverBalance.balance,
-                    currentBalance = updateSellBalance.balance,
+                    toCurrency = receiverBalance.currencyName,
+                    fromCurrency = sellBalance.currencyName,
+                    amount = amount.toDouble(),
+                    previousBanlace = sellBalance.balance,
+                    currentBalance = currentBalance,
                     commissionFee = transtionFeee
                 )
                 repository.addTransction(transaction)
@@ -87,7 +88,7 @@ class CalculationAndConvertUseCase(
                 val message =
                     "You have converted ${NumberFormatter.formatTwoDecimalNumber(amount = amount.toDouble())} ${sellCurrency.currencyName} to ${
                         NumberFormatter.formatTwoDecimalNumber(
-                            amount = total
+                            amount = totalConvertAmount
                         )
                     } ${receiverCurrency.currencyName}. Commission Fee - ${
                         NumberFormatter.formatTwoDecimalNumber(transtionFeee)
