@@ -1,7 +1,8 @@
 package com.saidul.paysera.di
 
-import com.itkacher.okprofiler.BuildConfig
+
 import com.localebro.okhttpprofiler.OkHttpProfilerInterceptor
+import com.saidul.paysera.BuildConfig
 import com.saidul.paysera.data.remote.ApiService
 import dagger.Module
 import dagger.Provides

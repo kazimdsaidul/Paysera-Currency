@@ -106,7 +106,7 @@ class MainViewModel @Inject constructor(
         return viewModelScope.launch {
             while (isActive) {
                 getLatest()
-                delay(10000)
+                delay(5000)
             }
         }
     }

@@ -21,21 +21,25 @@ class CalculationUseCase(
         try {
             val total: Double
             if (keyIsSellType == KEY_IS_SELL_TYPE) {
-
+                val amountDouble = amount.toDouble()
                 if (amount.toDouble() <= 0.0) {
                     emit(Resource.failed(message = "Amount is less than zero"))
+                    return@flow
+                }
+                val isRowIsExistRate = repository.isRowIsExistRate().first()
+                if (isRowIsExistRate == false) {
+                    emit(Resource.error(message = "Check your internet connection"))
                     return@flow
                 }
 
                 val sellRate = repository.getRate(sellBalance.currencyName).first()
                 val receiveRate = repository.getRate(receiverBalance.currencyName).first()
-                total = receiveRate.rate * amount.toDouble()
+                total = receiveRate.rate * amountDouble
 
-                if (sellBalance.balance < amount.toDouble()) {
+                if (sellBalance.balance < amountDouble) {
                     emit(Resource.failed(message = "Amount is not greater than current balance"))
                     return@flow
                 }
-
                 emit(Resource.success(data = total))
             }
         } catch (ex: NumberFormatException) { // handle your exception

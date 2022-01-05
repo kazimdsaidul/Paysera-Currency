@@ -43,7 +43,10 @@ interface LocalDBDao {
     fun isRowIsExistRate(id: Int): Flow<Boolean>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRate(balance: Rate)
+    suspend fun insertRate(rate: Rate)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRateList(rate: List<Rate>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRates(balance: List<Rate>)

@@ -37,15 +37,17 @@ class CurrencyRepositoryImpl(
         val rootJsonObject = JSONObject((createCall as Result.Success).data.string())
         val success = rootJsonObject.getBoolean(KEY_SUCCESS)
         if (success) {
-            dao.deleteRateData()
+            val tempData = mutableListOf<Rate>()
             val ratesJsonObject = rootJsonObject.getJSONObject(KEY_RATES)
             val keys = ratesJsonObject.keys()
             while (keys.hasNext()) {
                 val key: String = keys.next()
                 val value: Double = ratesJsonObject.get(key).toString().toDouble()
                 rateHashMap.put(key, value)
-                dao.insertRate(Rate(key, value))
+                tempData.add(Rate(currencyName = key, rate = value))
             }
+            dao.deleteRateData()
+            dao.insertRateList(tempData)
         }
         return Resource.success(data = rateHashMap)
     }
@@ -70,10 +72,14 @@ class CurrencyRepositoryImpl(
         return dao.getRates(currency)
     }
 
+
     override suspend fun deleteBalanceData() {
         dao.deleteBalanceData()
     }
 
+    override fun isRowIsExistRate(): Flow<Boolean> {
+        return dao.isRowIsExistRate(1)
+    }
 
 
     override suspend fun updateBalance(updateSellBalance: Balance) {

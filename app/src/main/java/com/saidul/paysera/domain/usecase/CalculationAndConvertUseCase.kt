@@ -34,6 +34,12 @@ class CalculationAndConvertUseCase(
                     return@flow
                 }
 
+                val isRowIsExistRate = repository.isRowIsExistRate().first()
+                if (isRowIsExistRate == false) {
+                    emit(Resource.error(message = "Check your internet connection"))
+                    return@flow
+                }
+                
                 val transactionSize = repository.getTransactionList().first().size
                 val sellBalance = repository.getBalance(sellCurrency.currencyName).first()
                 val receiverBalance = repository.getBalance(receiverCurrency.currencyName).first()
